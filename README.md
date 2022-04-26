@@ -13,7 +13,7 @@ Add the library to your dependencies:
 libraryDependencies += "com.stuart" %% "zcaffeine" % "x.x.x"
 ```
 
-Snapshots are also published on [Sonatype’s snapshots repository](https://oss.sonatype.org/content/repositories/snapshots/com/stuart/zcaffeine_2.13).
+Snapshots are also published on [Sonatype’s snapshots repository](https://s01.oss.sonatype.org/content/repositories/snapshots/com/stuart/).
 
 ## Usage
 
