@@ -87,7 +87,7 @@ You can also find additional examples from [zcaffeine’s tests](src/test/scala/
 // get or compute
 cache.get("key")
 // get all or compute all
-cache.getAll(Set("key1","key2"), keys => ZIO.succeed(keys.map(key => (key, key + key)).toMap))
+cache.getAll("key1","key2"))(keys => ZIO.succeed(keys.map(key => (key, key + key)).toMap))
 // get only if cached
 cache.getIfPresent("key3")
 // insert or replace
@@ -97,7 +97,7 @@ cache.invalidate("key")
 // invalidate all
 cache.invalidateAll
 // invalidate all specified keys
-cache.invalidateAll(Set("key1","key2"))
+cache.invalidateAll("key1","key2")
 
 
 /*****************************************************/
@@ -112,7 +112,7 @@ cache.getAll(Set("key1","key2"))
 // refresh using the functions set while building the cache and get
 cache.refresh("key1")
 // refresh all using the functions set while building the cache and get all
-cache.refreshAll(Set("key1","key2")) 
+cache.refreshAll("key1","key2")
 ```
 ## License
 
