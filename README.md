@@ -31,3 +31,7 @@ After configuration, the cache can be constructed through either:
 > Note:
 > `loadAll` and `reloadOne` are optional: both defer to `loadOne` if missing, but they can
 > set if the behavior should differ (eg. parallel computation in `loadAll`)
+
+## License
+
+This project is published under the [Apache 2.0 license](https://www.apache.org/licenses/LICENSE-2.0).
