@@ -12,6 +12,7 @@ inThisBuild(
   Seq(
     scalaVersion           := "2.13.8",
     crossScalaVersions     := List(scalaVersion.value, "3.1.2"),
+    versionScheme          := Some("semver-spec"),
     organization           := "com.stuart",
     licenses               := List(License.Apache2),
     developers             := devs,
