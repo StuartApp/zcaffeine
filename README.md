@@ -1,5 +1,10 @@
 # zcaffeine: ZIO-friendly Caffeine wrapper
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/StuartApp/zcaffeine/Continuous%20Integration)
+![GitHub](https://img.shields.io/github/license/StuartApp/zcaffeine)
+![Maven Central](https://img.shields.io/maven-central/v/com.stuart/zcaffeine_2.13?label=Release)
+![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.stuart/zcaffeine_2.13?label=Snapshot&server=https%3A%2F%2Fs01.oss.sonatype.org)
+
 zcaffeine is a ZIO-friendly wrapper for the [Caffeine cache library](https://github.com/ben-manes/caffeine).
 
 * Built for ZIO 2
