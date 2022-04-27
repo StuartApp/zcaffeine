@@ -17,7 +17,7 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    * @return
    *   the current or newly computed value for the given key
    */
-  def get(key: Key, mappingFunction: Key => RIO[R, Value]): Task[Value] =
+  def get(key: Key)(mappingFunction: Key => RIO[R, Value]): Task[Value] =
     ZIO.fromCompletableFuture(
       underlying.get(key, (key, _) => zioToCompletableFuture(runtime)(mappingFunction(key)))
     )
@@ -32,16 +32,21 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    * @return
    *   the current or newly computed values for the given keys
    */
-  def getAll(keys: Set[Key], mappingFunction: Set[Key] => RIO[R, Map[Key, Value]]): Task[Map[Key, Value]] =
-    ZIO
-      .fromCompletableFuture(
-        underlying
-          .getAll(
-            keys.asJava,
-            (keys, _) => zioToCompletableFuture(runtime)(mappingFunction(keys.asScala.toSet).map(_.asJava))
-          )
-      )
-      .map(_.asScala.toMap)
+  def getAll(keys: Set[Key])(mappingFunction: Set[Key] => RIO[R, Map[Key, Value]]): Task[Map[Key, Value]] =
+    getAllInternal(keys)(keys => mappingFunction(keys.toSet))
+
+  /**
+   * Returns the values associated with the given keys in this cache, or asynchronously compute them if missing. Keys
+   * that are missing from the `mappingFunction` result won’t be saved in the cache.
+   * @param keys
+   *   the keys for which the associated values are to be returned
+   * @param mappingFunction
+   *   the function defining how to compute values for keys that are missing from the cache
+   * @return
+   *   the current or newly computed values for the given keys
+   */
+  def getAll(keys: Key*)(mappingFunction: Seq[Key] => RIO[R, Map[Key, Value]]): Task[Map[Key, Value]] =
+    getAllInternal(keys)(keys => mappingFunction(keys.toSeq))
 
   /**
    * Returns the value associated with the given key if present in this cache, otherwise returns None.
@@ -90,7 +95,16 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    * @return
    */
   def invalidateAll(keys: Set[Key]): Task[Unit] =
-    ZIO.attemptBlocking(underlying.synchronous().invalidateAll(keys.asJava))
+    invalidateAllInternal(keys)
+
+  /**
+   * Remove the cached values for the given keys in this cache if present.
+   * @param keys
+   *   the keys whose cached values are to be removed from the cache
+   * @return
+   */
+  def invalidateAll(keys: Key*): Task[Unit] =
+    invalidateAllInternal(keys)
 
   /**
    * Returns the estimated size for this cache. It is only an estimation as it depends if there are pending
@@ -116,6 +130,22 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    */
   def cleanUp: Task[Unit] =
     ZIO.attemptBlocking(underlying.synchronous().cleanUp())
+
+  private def getAllInternal(
+      keys: Iterable[Key]
+  )(mappingFunction: Iterable[Key] => RIO[R, Map[Key, Value]]): Task[Map[Key, Value]] =
+    ZIO
+      .fromCompletableFuture(
+        underlying
+          .getAll(
+            keys.asJava,
+            (keys, _) => zioToCompletableFuture(runtime)(mappingFunction(keys.asScala).map(_.asJava))
+          )
+      )
+      .map(_.asScala.toMap)
+
+  private def invalidateAllInternal(keys: Iterable[Key]): Task[Unit] =
+    ZIO.attemptBlocking(underlying.synchronous().invalidateAll(keys.asJava))
 }
 
 final class LoadingCache[R, Key, Value] private[zcaffeine] (
@@ -143,7 +173,18 @@ final class LoadingCache[R, Key, Value] private[zcaffeine] (
    *   the current or newly computed values for the given keys
    */
   def getAll(keys: Set[Key]): Task[Map[Key, Value]] =
-    ZIO.fromCompletableFuture(underlying.getAll(keys.asJava)).map(_.asScala.toMap)
+    getAllInternal(keys)
+
+  /**
+   * Returns the value associated with the given key in this cache, or asynchronously computes it, based on the
+   * `loadAll` function specified while building the cache if defined, or falls back to `loadOne`.
+   * @param keys
+   *   the keys whose associated values are to be returned
+   * @return
+   *   the current or newly computed values for the given keys
+   */
+  def getAll(keys: Key*): Task[Map[Key, Value]] =
+    getAllInternal(keys)
 
   /**
    * Refreshes the value associated with the given key in this cache, based on the `reloadOne` function specified while
@@ -165,5 +206,22 @@ final class LoadingCache[R, Key, Value] private[zcaffeine] (
    *   the refreshed values for the given keys
    */
   def refreshAll(keys: Set[Key]): Task[Map[Key, Value]] =
+    refreshAllInternal(keys)
+
+  /**
+   * Refreshes the values associated with the given keys in this cache, based on the `reloadOne` function specified
+   * while building the cache if defined, or falls back to `loadOne`.
+   * @param keys
+   *   the keys whose associated values are to be refreshed
+   * @return
+   *   the refreshed values for the given keys
+   */
+  def refreshAll(keys: Key*): Task[Map[Key, Value]] =
+    refreshAllInternal(keys)
+
+  private def getAllInternal(keys: Iterable[Key]): Task[Map[Key, Value]] =
+    ZIO.fromCompletableFuture(underlying.getAll(keys.asJava)).map(_.asScala.toMap)
+
+  private def refreshAllInternal(keys: Iterable[Key]): Task[Map[Key, Value]] =
     ZIO.fromCompletableFuture(underlying.synchronous().refreshAll(keys.asJava)).map(_.asScala.toMap)
 }
