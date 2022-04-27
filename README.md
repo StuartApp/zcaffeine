@@ -15,7 +15,7 @@ zcaffeine is a ZIO-friendly wrapper for the [Caffeine cache library](https://git
 Add the library to your dependencies:
 
 ```scala
-libraryDependencies += "com.stuart" %% "zcaffeine" % "x.x.x"
+libraryDependencies += "com.stuart" %% "zcaffeine" % "1.0.0-M1"
 ```
 
 Snapshots are also published on [Sonatype’s snapshots repository](https://s01.oss.sonatype.org/content/repositories/snapshots/com/stuart/).
