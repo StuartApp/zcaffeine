@@ -1,5 +1,10 @@
 # zcaffeine: ZIO-friendly Caffeine wrapper
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/StuartApp/zcaffeine/Continuous%20Integration)
+![GitHub](https://img.shields.io/github/license/StuartApp/zcaffeine)
+![Maven Central](https://img.shields.io/maven-central/v/com.stuart/zcaffeine_2.13?label=Release)
+![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/com.stuart/zcaffeine_2.13?label=Snapshot&server=https%3A%2F%2Fs01.oss.sonatype.org)
+
 zcaffeine is a ZIO-friendly wrapper for the [Caffeine cache library](https://github.com/ben-manes/caffeine).
 
 * Built for ZIO 2
@@ -10,10 +15,10 @@ zcaffeine is a ZIO-friendly wrapper for the [Caffeine cache library](https://git
 Add the library to your dependencies:
 
 ```scala
-libraryDependencies += "com.stuart" %% "zcaffeine" % "x.x.x"
+libraryDependencies += "com.stuart" %% "zcaffeine" % "1.0.0-M1"
 ```
 
-Snapshots are also published on [Sonatype’s snapshots repository](https://oss.sonatype.org/content/repositories/snapshots/com/stuart/zcaffeine_2.13).
+Snapshots are also published on [Sonatype’s snapshots repository](https://s01.oss.sonatype.org/content/repositories/snapshots/com/stuart/).
 
 ## Usage
 
