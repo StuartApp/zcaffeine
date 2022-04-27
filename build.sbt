@@ -14,6 +14,7 @@ inThisBuild(
     crossScalaVersions     := List(scalaVersion.value, "3.1.2"),
     versionScheme          := Some("semver-spec"),
     organization           := "com.stuart",
+    homepage               := Some(url("https://github.com/StuartApp/zcaffeine")),
     licenses               := List(License.Apache2),
     developers             := devs,
     sonatypeCredentialHost := "s01.oss.sonatype.org",
