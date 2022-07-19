@@ -34,7 +34,7 @@ val zcaffeine = (project in file("."))
     autoAPIMappings   := true,
     Compile / doc / scalacOptions ++= scaladocOptions(scalaVersion.value),
     libraryDependencies ++= Seq(
-      "com.github.ben-manes.caffeine" % "caffeine"           % "3.0.6",
+      "com.github.ben-manes.caffeine" % "caffeine"           % "3.1.1",
       "dev.zio"                      %% "zio"                % zioVersion,
       "dev.zio"                      %% "zio-prelude"        % "1.0.0-RC13",
       "org.scala-lang.modules"       %% "scala-java8-compat" % "1.0.2",
