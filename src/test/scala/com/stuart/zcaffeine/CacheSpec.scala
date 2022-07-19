@@ -6,7 +6,7 @@ import zio.test.{ TestEnvironment, _ }
 
 object CacheSpec extends ZIOSpecDefault {
 
-  override def spec: ZSpec[TestEnvironment with Scope, Any] =
+  override def spec: Spec[TestEnvironment, Any] =
     suite("CacheSpec")(
       test("get/getIfPresent") {
         for {

@@ -6,7 +6,7 @@ import zio.test.{ TestEnvironment, _ }
 
 object RemovalListenerSpec extends ZIOSpecDefault {
 
-  override def spec: ZSpec[TestEnvironment, Any] =
+  override def spec: Spec[TestEnvironment, Any] =
     suite("RemovalListenerSpec")(
       test("removalListener notifies on value evictions") {
         for {
