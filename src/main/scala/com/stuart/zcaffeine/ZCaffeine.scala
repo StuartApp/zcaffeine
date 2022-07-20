@@ -173,7 +173,7 @@ object ZCaffeine {
    */
   def fromCaffeineSpec[R, Key, Value](caffeineSpec: String): RIO[R, ZCaffeine[R, Unconfigured, Key, Value]] =
     for {
-      spec      <- Task.attempt(CaffeineSpec.parse(caffeineSpec))
+      spec      <- ZIO.attempt(CaffeineSpec.parse(caffeineSpec))
       zcaffeine <- fromCaffeineSpec[R, Key, Value](spec)
     } yield zcaffeine
 
@@ -216,8 +216,11 @@ object ZCaffeine {
     for {
       executor <- ZIO.executor
       runtime  <- ZIO.runtime[R]
-      configured =
-        ZIO.attempt(caffeine.executor(executor.asJava).ticker(() => runtime.unsafeRun(ZIO.clockWith(_.nanoTime))))
+      configured = ZIO.attempt(
+                     caffeine
+                       .executor(executor.asJava)
+                       .ticker(() => zioToValue(runtime)(Clock.nanoTime))
+                   )
     } yield new ZCaffeine[R, Unconfigured, Key, Value](runtime, configured)
 }
 
@@ -312,7 +315,7 @@ class ZCaffeine[R, S <: State, Key, Value] private (
   )(implicit ev: Conflict[EvictionListener, S]): ZCaffeine[R, S with EvictionListener, Key, Value] =
     withNewBuilder(
       _.evictionListener((key: Key, value: Value, cause: RemovalCause) =>
-        runtime.unsafeRunTask(listener(key, value, cause))
+        zioToValue(runtime)(listener(key, value, cause))
       )
     )
 
@@ -483,7 +486,7 @@ class ZCaffeine[R, S <: State, Key, Value] private (
   )(implicit ev: Conflict[RemovalListener, S]): ZCaffeine[R, S with RemovalListener, Key, Value] =
     withNewBuilder(
       _.removalListener((key: Key, value: Value, cause: RemovalCause) =>
-        runtime.unsafeRunTask(listener(key, value, cause))
+        zioToValue(runtime)(listener(key, value, cause))
       )
     )
 

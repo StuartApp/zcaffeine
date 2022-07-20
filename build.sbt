@@ -5,7 +5,8 @@ val scalafixDeps = Seq(
 )
 
 val devs = List(
-  Developer("pdalpra", "Pierre Dal-Pra", "p.dalpra@stuart.com", url("https://stuart.com"))
+  Developer("pdalpra", "Pierre Dal-Pra", "p.dalpra@stuart.com", url("https://stuart.com")),
+  Developer("aartigao", "Alan Artigao Carreño", "a.artigao@stuart.com", url("https://stuart.com"))
 )
 
 inThisBuild(
@@ -23,7 +24,7 @@ inThisBuild(
   )
 )
 
-val zioVersion = "2.0.0-RC5"
+val zioVersion = "2.0.0"
 
 val zcaffeine = (project in file("."))
   .settings(fmtAllAlias)
@@ -36,7 +37,7 @@ val zcaffeine = (project in file("."))
     libraryDependencies ++= Seq(
       "com.github.ben-manes.caffeine" % "caffeine"           % "3.1.1",
       "dev.zio"                      %% "zio"                % zioVersion,
-      "dev.zio"                      %% "zio-prelude"        % "1.0.0-RC13",
+      "dev.zio"                      %% "zio-prelude"        % "1.0.0-RC15",
       "org.scala-lang.modules"       %% "scala-java8-compat" % "1.0.2",
       // Testing
       "dev.zio" %% "zio-test"     % zioVersion % "test",

@@ -6,7 +6,7 @@ import zio.test.{ TestEnvironment, _ }
 
 object LoadingCacheSpec extends ZIOSpecDefault {
 
-  override def spec: ZSpec[TestEnvironment, Any] =
+  override def spec: Spec[TestEnvironment, Any] =
     suite("LoadingCacheSpec")(
       test("get/getAll/refresh/refreshAll") {
         for {
