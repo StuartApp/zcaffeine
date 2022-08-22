@@ -2,15 +2,15 @@ package com.stuart.zcaffeine
 
 import zio._
 import zio.test.Assertion._
-import zio.test.{ TestEnvironment, _ }
+import zio.test._
 
-object LoadingCacheSpec extends ZIOSpecDefault {
+object LoadingCacheSpec extends DefaultRunnableSpec {
 
-  override def spec: Spec[TestEnvironment, Any] =
+  override def spec =
     suite("LoadingCacheSpec")(
-      test("get/getAll/refresh/refreshAll") {
+      testM("get/getAll/refresh/refreshAll") {
         for {
-          zcaffeine <- ZCaffeine[TestEnvironment, String, String]()
+          zcaffeine <- ZCaffeine[ZEnv, String, String]()
           cache <- zcaffeine.build(
                      loadOne = key => ZIO.succeed(s"loadOne: $key"),
                      loadAll = Some(keys => ZIO.succeed(keys.map(key => key -> s"loadAll: $key").toMap)),

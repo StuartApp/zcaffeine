@@ -2,15 +2,15 @@ package com.stuart.zcaffeine
 
 import zio._
 import zio.test.Assertion._
-import zio.test.{ TestEnvironment, _ }
+import zio.test._
 
-object CacheSpec extends ZIOSpecDefault {
+object CacheSpec extends DefaultRunnableSpec {
 
-  override def spec: Spec[TestEnvironment, Any] =
+  override def spec =
     suite("CacheSpec")(
-      test("get/getIfPresent") {
+      testM("get/getIfPresent") {
         for {
-          zcaffeine <- ZCaffeine[TestEnvironment, String, Int]()
+          zcaffeine <- ZCaffeine[ZEnv, String, Int]()
           cache     <- zcaffeine.build()
           missing   <- cache.getIfPresent("key")
           created   <- cache.get("key")(key => ZIO.succeed(key.length))
@@ -21,9 +21,9 @@ object CacheSpec extends ZIOSpecDefault {
           assert(created)(equalTo(unchanged)) &&
           assert(present)(isSome(equalTo(created)))
       },
-      test("getAll") {
+      testM("getAll") {
         for {
-          zcaffeine <- ZCaffeine[TestEnvironment, String, Int]()
+          zcaffeine <- ZCaffeine[ZEnv, String, Int]()
           cache     <- zcaffeine.build()
           missing1  <- cache.getIfPresent("key")
           missing2  <- cache.getIfPresent("key2")
@@ -35,9 +35,9 @@ object CacheSpec extends ZIOSpecDefault {
           assert(created)(equalTo(Map("key" -> 3, "key2" -> 4))) &&
           assert(created)(equalTo(unchanged))
       },
-      test("put") {
+      testM("put") {
         for {
-          zcaffeine <- ZCaffeine[TestEnvironment, String, Int]()
+          zcaffeine <- ZCaffeine[ZEnv, String, Int]()
           cache     <- zcaffeine.build()
           missing   <- cache.getIfPresent("key")
           _         <- cache.put("key", ZIO.succeed(1))
@@ -48,9 +48,9 @@ object CacheSpec extends ZIOSpecDefault {
           assert(created)(isSome(equalTo(1))) &&
           assert(updated)(isSome(equalTo(3)))
       },
-      test("invalidate/invalidateAll") {
+      testM("invalidate/invalidateAll") {
         for {
-          zcaffeine   <- ZCaffeine[TestEnvironment, String, Int]()
+          zcaffeine   <- ZCaffeine[ZEnv, String, Int]()
           cache       <- zcaffeine.build()
           _           <- cache.getAll("key", "key2")(keys => ZIO.succeed(keys.map(key => key -> key.length).toMap))
           _           <- cache.invalidate("key")

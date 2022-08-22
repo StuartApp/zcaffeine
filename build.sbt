@@ -24,12 +24,13 @@ inThisBuild(
   )
 )
 
-val zioVersion = "2.0.0"
+val zioVersion = "1.0.16"
 
 val zcaffeine = (project in file("."))
   .settings(fmtAllAlias)
-  .settings(organization := "com.stuart")
   .settings(
+    organization := "com.stuart",
+    name := "zcaffeine-zio1",
     semanticdbEnabled := true,
     semanticdbVersion := scalafixSemanticdb.revision,
     autoAPIMappings   := true,
@@ -37,7 +38,7 @@ val zcaffeine = (project in file("."))
     libraryDependencies ++= Seq(
       "com.github.ben-manes.caffeine" % "caffeine"           % "3.1.1",
       "dev.zio"                      %% "zio"                % zioVersion,
-      "dev.zio"                      %% "zio-prelude"        % "1.0.0-RC15",
+      "dev.zio"                      %% "zio-prelude"        % "1.0.0-RC8-1",
       "org.scala-lang.modules"       %% "scala-java8-compat" % "1.0.2",
       // Testing
       "dev.zio" %% "zio-test"     % zioVersion % "test",

@@ -2,15 +2,15 @@ package com.stuart.zcaffeine
 
 import java.util
 import java.util.concurrent._
-import scala.annotation.{ implicitAmbiguous, nowarn }
+import scala.annotation.{implicitAmbiguous, nowarn}
 import scala.jdk.CollectionConverters._
-
 import com.stuart.zcaffeine.ZCaffeine.State
 import com.stuart.zcaffeine.ZCaffeine.State._
 import com.stuart.zcaffeine.types._
-
-import com.github.benmanes.caffeine.cache.{ AsyncCacheLoader, Caffeine, CaffeineSpec, Expiry, RemovalCause }
-import zio.{ Executor => _, _ }
+import com.github.benmanes.caffeine.cache.{AsyncCacheLoader, Caffeine, CaffeineSpec, Expiry, RemovalCause}
+import zio._
+import zio.clock.Clock
+import zio.duration._
 
 object ZCaffeine {
 
@@ -171,9 +171,9 @@ object ZCaffeine {
    * @return
    *   an preconfigured [[ZCaffeine]] cache builder
    */
-  def fromCaffeineSpec[R, Key, Value](caffeineSpec: String): RIO[R, ZCaffeine[R, Unconfigured, Key, Value]] =
+  def fromCaffeineSpec[R <: Clock, Key, Value](caffeineSpec: String): RIO[R, ZCaffeine[R, Unconfigured, Key, Value]] =
     for {
-      spec      <- ZIO.attempt(CaffeineSpec.parse(caffeineSpec))
+      spec      <- ZIO.effect(CaffeineSpec.parse(caffeineSpec))
       zcaffeine <- fromCaffeineSpec[R, Key, Value](spec)
     } yield zcaffeine
 
@@ -191,7 +191,7 @@ object ZCaffeine {
    * @return
    *   an unconfigured [[ZCaffeine]] cache builder
    */
-  def fromCaffeineSpec[R, Key, Value](
+  def fromCaffeineSpec[R <: Clock, Key, Value](
       caffeineSpec: CaffeineSpec
   ): URIO[R, ZCaffeine[R, Unconfigured, Key, Value]] =
     apply(Caffeine.from(caffeineSpec).asInstanceOf[Caffeine[Key, Value]])
@@ -207,25 +207,22 @@ object ZCaffeine {
    * @return
    *   an unconfigured [[ZCaffeine]] cache builder
    */
-  def apply[R, Key, Value](): URIO[R, ZCaffeine[R, Unconfigured, Key, Value]] =
+  def apply[R <: Clock, Key, Value](): URIO[R, ZCaffeine[R, Unconfigured, Key, Value]] =
     apply(Caffeine.newBuilder().asInstanceOf[Caffeine[Key, Value]])
 
-  private def apply[R, Key, Value](
+  private def apply[R <: Clock, Key, Value](
       caffeine: => Caffeine[Key, Value]
   ): URIO[R, ZCaffeine[R, Unconfigured, Key, Value]] =
     for {
       executor <- ZIO.executor
       runtime  <- ZIO.runtime[R]
-      configured = ZIO.attempt(
-                     caffeine
-                       .executor(executor.asJava)
-                       .ticker(() => zioToValue(runtime)(Clock.nanoTime))
+      configured = ZIO.effect(caffeine.executor(executor.asJava).ticker(() => zioToValue(runtime)(zio.clock.nanoTime))
                    )
     } yield new ZCaffeine[R, Unconfigured, Key, Value](runtime, configured)
 }
 
 @nowarn("msg=parameter value ev in method .* is never used")
-class ZCaffeine[R, S <: State, Key, Value] private (
+class ZCaffeine[R <: Clock, S <: State, Key, Value] private (
     runtime: Runtime[R],
     builder: RIO[R, Caffeine[Key, Value]]
 ) {
@@ -241,7 +238,7 @@ class ZCaffeine[R, S <: State, Key, Value] private (
    *   a cache having the requested features
    */
   def build(): RIO[R, Cache[R, Key, Value]] =
-    builder.flatMap(b => ZIO.attempt(new Cache(runtime, b.buildAsync())))
+    builder.flatMap(b => ZIO.effect(new Cache(runtime, b.buildAsync())))
 
   /**
    * Builds a cache, which either returns the value already loaded or currently computing the value for a given key, or
@@ -264,7 +261,7 @@ class ZCaffeine[R, S <: State, Key, Value] private (
       reloadOne: Option[(Key, Value) => RIO[R, Value]] = None
   ): RIO[R, LoadingCache[R, Key, Value]] =
     builder.flatMap { b =>
-      ZIO.attempt {
+      ZIO.effect {
         new LoadingCache(
           runtime,
           b.buildAsync(new AsyncCacheLoader[Key, Value] {
@@ -507,12 +504,12 @@ class ZCaffeine[R, S <: State, Key, Value] private (
     withNewBuilder(
       _.scheduler((_, command, delay, timeUnit) =>
         zioToCompletableFuture(runtime)(
-          ZIO.attempt(command.run()).schedule(Schedule.duration(Duration.apply(delay, timeUnit))).unit
+          ZIO.effect(command.run()).schedule(Schedule.duration(Duration(delay, timeUnit))).unit
         )
       )
     )
 
   private def withNewBuilder[NewState <: State](configurer: Caffeine[Key, Value] => Caffeine[Key, Value]) =
-    new ZCaffeine[R, S with NewState, Key, Value](runtime, builder.flatMap(b => ZIO.attempt(configurer(b))))
+    new ZCaffeine[R, S with NewState, Key, Value](runtime, builder.flatMap(b => ZIO.effect(configurer(b))))
 
 }

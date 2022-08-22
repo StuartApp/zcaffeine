@@ -2,16 +2,18 @@ package com.stuart.zcaffeine
 
 import zio._
 import zio.test.Assertion._
-import zio.test.{ TestEnvironment, _ }
+import zio.test._
+import zio.duration._
+import zio.test.environment._
 
-object RemovalListenerSpec extends ZIOSpecDefault {
+object RemovalListenerSpec extends DefaultRunnableSpec {
 
-  override def spec: Spec[TestEnvironment, Any] =
+  override def spec =
     suite("RemovalListenerSpec")(
-      test("removalListener notifies on value evictions") {
+      testM("removalListener notifies on value evictions") {
         for {
           evictedKeys <- Ref.make(List.empty[String])
-          zcaffeine   <- ZCaffeine[TestEnvironment, String, Int]()
+          zcaffeine   <- ZCaffeine[ZEnv, String, Int]()
           cache <- zcaffeine
                      .enableScheduling()
                      .removalListener((key, _, _) => evictedKeys.update(key :: _))

@@ -1,10 +1,10 @@
 package com.stuart.zcaffeine
 
 import scala.jdk.CollectionConverters._
-
 import com.github.benmanes.caffeine.cache.stats.CacheStats
-import com.github.benmanes.caffeine.cache.{ AsyncCache, AsyncLoadingCache }
+import com.github.benmanes.caffeine.cache.{AsyncCache, AsyncLoadingCache}
 import zio._
+import zio.blocking.Blocking
 
 sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], underlying: AsyncCache[Key, Value]) {
 
@@ -70,7 +70,7 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    * @return
    */
   def put(key: Key, value: RIO[R, Value]): RIO[R, Unit] =
-    value.toCompletableFuture.flatMap(v => ZIO.attempt(underlying.put(key, v)))
+    value.toCompletableFuture.flatMap(v => ZIO.effect(underlying.put(key, v)))
 
   /**
    * Removes the cached value for the given key in this cache if present.
@@ -78,15 +78,15 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    *   the key whose cached value is to be removed from the cache
    * @return
    */
-  def invalidate(key: Key): Task[Unit] =
-    ZIO.attemptBlocking(underlying.synchronous().invalidate(key))
+  def invalidate(key: Key): RIO[Blocking, Unit] =
+    blocking.effectBlocking(underlying.synchronous().invalidate(key))
 
   /**
    * Removes all cached values in this cache.
    * @return
    */
-  def invalidateAll: Task[Unit] =
-    ZIO.attemptBlocking(underlying.synchronous().invalidateAll())
+  def invalidateAll: RIO[Blocking, Unit] =
+    blocking.effectBlocking(underlying.synchronous().invalidateAll())
 
   /**
    * Remove the cached values for the given keys in this cache if present.
@@ -94,7 +94,7 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    *   the keys whose cached values are to be removed from the cache
    * @return
    */
-  def invalidateAll(keys: Set[Key]): Task[Unit] =
+  def invalidateAll(keys: Set[Key]): RIO[Blocking, Unit] =
     invalidateAllInternal(keys)
 
   /**
@@ -103,7 +103,7 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    *   the keys whose cached values are to be removed from the cache
    * @return
    */
-  def invalidateAll(keys: Key*): Task[Unit] =
+  def invalidateAll(keys: Key*): RIO[Blocking, Unit] =
     invalidateAllInternal(keys)
 
   /**
@@ -112,8 +112,8 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    * @return
    *   the estimated size of this cache
    */
-  def estimatedSize: Task[Long] =
-    ZIO.attemptBlocking(underlying.synchronous().estimatedSize())
+  def estimatedSize: RIO[Blocking, Long] =
+    blocking.effectBlocking(underlying.synchronous().estimatedSize())
 
   /**
    * Returns the cache statistics computed for this cache, if previously enabled with `recordStats` when building the
@@ -121,15 +121,15 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
    * @return
    *   the cache statistics for this cache
    */
-  def stats: Task[CacheStats] =
-    ZIO.attemptBlocking(underlying.synchronous().stats())
+  def stats: RIO[Blocking, CacheStats] =
+    blocking.effectBlocking(underlying.synchronous().stats())
 
   /**
    * Immediately run any pending maintenance operations on this cache, such as evicting expired entries.
    * @return
    */
-  def cleanUp: Task[Unit] =
-    ZIO.attemptBlocking(underlying.synchronous().cleanUp())
+  def cleanUp: RIO[Blocking, Unit] =
+    blocking.effectBlocking(underlying.synchronous().cleanUp())
 
   private def getAllInternal(
       keys: Iterable[Key]
@@ -144,8 +144,8 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
       )
       .map(_.asScala.toMap)
 
-  private def invalidateAllInternal(keys: Iterable[Key]): Task[Unit] =
-    ZIO.attemptBlocking(underlying.synchronous().invalidateAll(keys.asJava))
+  private def invalidateAllInternal(keys: Iterable[Key]): RIO[Blocking, Unit] =
+    blocking.effectBlocking(underlying.synchronous().invalidateAll(keys.asJava))
 }
 
 final class LoadingCache[R, Key, Value] private[zcaffeine] (
