@@ -125,6 +125,14 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
     blocking.effectBlocking(underlying.synchronous().stats())
 
   /**
+   * Returns an immutable view of the cache contents.
+   * @return
+   * the cache contents, as a Map
+   */
+  def asMap: RIO[Blocking, Map[Key,Value]] =
+    blocking.effectBlocking(underlying.synchronous().asMap().asScala.toMap)
+
+  /**
    * Immediately run any pending maintenance operations on this cache, such as evicting expired entries.
    * @return
    */
