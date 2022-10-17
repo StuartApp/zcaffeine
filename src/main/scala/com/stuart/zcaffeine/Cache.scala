@@ -125,6 +125,14 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
     ZIO.attemptBlocking(underlying.synchronous().stats())
 
   /**
+   * Returns an immutable view of the cache contents.
+   * @return
+   * the cache contents, as a Map
+   */
+  def asMap: Task[Map[Key,Value]] =
+    ZIO.attemptBlocking(underlying.synchronous().asMap().asScala.toMap)
+
+  /**
    * Immediately run any pending maintenance operations on this cache, such as evicting expired entries.
    * @return
    */
