@@ -11,7 +11,7 @@ val devs = List(
 
 inThisBuild(
   Seq(
-    scalaVersion           := "2.13.10",
+    scalaVersion           := "2.13.8",
     crossScalaVersions     := List(scalaVersion.value, "3.1.3"),
     versionScheme          := Some("semver-spec"),
     organization           := "com.stuart",
