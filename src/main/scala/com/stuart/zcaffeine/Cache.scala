@@ -127,9 +127,9 @@ sealed class Cache[R, Key, Value] private[zcaffeine] (runtime: Runtime[R], under
   /**
    * Returns an immutable view of the cache contents.
    * @return
-   * the cache contents, as a Map
+   *   the cache contents, as a Map
    */
-  def asMap: Task[Map[Key,Value]] =
+  def asMap: Task[Map[Key, Value]] =
     ZIO.attemptBlocking(underlying.synchronous().asMap().asScala.toMap)
 
   /**
