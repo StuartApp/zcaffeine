@@ -12,7 +12,7 @@ val devs = List(
 inThisBuild(
   Seq(
     scalaVersion           := "2.13.8",
-    crossScalaVersions     := List(scalaVersion.value, "3.1.3"),
+    crossScalaVersions     := List(scalaVersion.value, "3.2.1"),
     versionScheme          := Some("semver-spec"),
     organization           := "com.stuart",
     homepage               := Some(url("https://github.com/StuartApp/zcaffeine")),
@@ -24,7 +24,7 @@ inThisBuild(
   )
 )
 
-val zioVersion = "2.0.0"
+val zioVersion = "2.0.4"
 
 val zcaffeine = (project in file("."))
   .settings(fmtAllAlias)
@@ -35,7 +35,7 @@ val zcaffeine = (project in file("."))
     autoAPIMappings   := true,
     Compile / doc / scalacOptions ++= scaladocOptions(scalaVersion.value),
     libraryDependencies ++= Seq(
-      "com.github.ben-manes.caffeine" % "caffeine"           % "3.1.1",
+      "com.github.ben-manes.caffeine" % "caffeine"           % "3.1.2",
       "dev.zio"                      %% "zio"                % zioVersion,
       "dev.zio"                      %% "zio-prelude"        % "1.0.0-RC15",
       "org.scala-lang.modules"       %% "scala-java8-compat" % "1.0.2",
