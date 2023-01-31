@@ -12,7 +12,7 @@ val devs = List(
 inThisBuild(
   Seq(
     scalaVersion           := "2.13.8",
-    crossScalaVersions     := List(scalaVersion.value, "3.2.1"),
+    crossScalaVersions     := List(scalaVersion.value, "3.2.2"),
     versionScheme          := Some("semver-spec"),
     organization           := "com.stuart",
     homepage               := Some(url("https://github.com/StuartApp/zcaffeine")),
