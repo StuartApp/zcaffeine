@@ -24,7 +24,7 @@ inThisBuild(
   )
 )
 
-val zioVersion = "2.0.4"
+val zioVersion = "2.0.8"
 
 val zcaffeine = (project in file("."))
   .settings(fmtAllAlias)
