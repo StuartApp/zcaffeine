@@ -4,4 +4,4 @@ addSbtPlugin("com.codecommit"                    % "sbt-github-actions" % "0.14.
 addSbtPlugin("ch.epfl.scala"                     % "sbt-scalafix"       % "0.10.1")
 addSbtPlugin("org.scalameta"                     % "sbt-scalafmt"       % "2.5.0")
 addSbtPlugin("org.scoverage"                     % "sbt-scoverage"      % "2.0.6")
-addSbtPlugin("io.github.davidgregory084"         % "sbt-tpolecat"       % "0.4.1")
+addSbtPlugin("io.github.davidgregory084"         % "sbt-tpolecat"       % "0.4.4")
