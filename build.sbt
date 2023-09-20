@@ -37,7 +37,7 @@ val zcaffeine = (project in file("."))
     libraryDependencies ++= Seq(
       "com.github.ben-manes.caffeine" % "caffeine"           % "3.1.2",
       "dev.zio"                      %% "zio"                % zioVersion,
-      "dev.zio"                      %% "zio-prelude"        % "1.0.0-RC15",
+      "dev.zio"                      %% "zio-prelude"        % "1.0.0-RC21",
       "org.scala-lang.modules"       %% "scala-java8-compat" % "1.0.2",
       // Testing
       "dev.zio" %% "zio-test"     % zioVersion % "test",
