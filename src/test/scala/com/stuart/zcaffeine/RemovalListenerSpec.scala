@@ -12,7 +12,7 @@ object RemovalListenerSpec extends ZIOSpecDefault {
         for {
           evictedKeys <- Ref.make(List.empty[String])
           zcaffeine   <- ZCaffeine[TestEnvironment, String, Int]()
-          cache <- zcaffeine
+          cache       <- zcaffeine
                      .enableScheduling()
                      .removalListener((key, _, _) => evictedKeys.update(key :: _))
                      .build()
