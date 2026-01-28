@@ -214,8 +214,8 @@ object ZCaffeine {
       caffeine: => Caffeine[Key, Value]
   ): URIO[R, ZCaffeine[R, Unconfigured, Key, Value]] =
     for {
-      executor <- ZIO.executor
-      runtime  <- ZIO.runtime[R]
+      executor  <- ZIO.executor
+      runtime   <- ZIO.runtime[R]
       configured = ZIO.attempt(
                      caffeine
                        .executor(executor.asJava)
@@ -278,7 +278,7 @@ class ZCaffeine[R, S <: State, Key, Value] private (
             ): CompletableFuture[util.Map[Key, Value]] = zioToCompletableFuture(runtime) {
               loadAll match {
                 case Some(f) => f(keys.asScala.toSet).map(_.asJava)
-                case None =>
+                case None    =>
                   ZIO
                     .foreach(keys.asScala.toSet)(key => loadOne(key).map(key -> _))
                     .map(_.toMap[Key, Value].asJava)
