@@ -11,7 +11,7 @@ object LoadingCacheSpec extends ZIOSpecDefault {
       test("get/getAll/refresh/refreshAll") {
         for {
           zcaffeine <- ZCaffeine[TestEnvironment, String, String]()
-          cache <- zcaffeine.build(
+          cache     <- zcaffeine.build(
                      loadOne = key => ZIO.succeed(s"loadOne: $key"),
                      loadAll = Some(keys => ZIO.succeed(keys.map(key => key -> s"loadAll: $key").toMap)),
                      reloadOne = Some((key, value) => ZIO.succeed(s"""reloadOne: $key (old: "$value")"""))
